@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="100dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/defaultimage"
+            android:visibility="gone"
+            android:id="@+id/profileImage"
+            android:contentDescription="TODO" />
+
+        <EditText
+            android:id="@+id/accountText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:hint="Enter your account name"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/passwordText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/accountText"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="5sp"
+            android:hint="Enter your password"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/emailText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/passwordText"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="5sp"
+            android:hint="Enter your email address"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/signInButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/emailText"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="5sp"
+            android:text="Sign In"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/createAccountButton"
+            style="@android:style/Widget.Holo.Button.Toggle"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signInButton"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="5sp"
+            android:text="Register"
+            android:textSize="20sp"/>
+
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

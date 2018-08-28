@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Statement</string>
+    <string-array name="purpose">
+        <item>Transportation</item>
+        <item>Meal</item>
+        <item>Entertainment</item>
+        <item>Other</item>
+        <item>Taobao</item>
+    </string-array>
+
+    <string-array name="category">
+        <item>All</item>
+        <item>Transportation</item>
+        <item>Meal</item>
+        <item>Entertainment</item>
+        <item>Other</item>
+        <item>Taobao</item>
+    </string-array>
+
+    <string name="incomeText">Income</string>
+    <string name="outcomeText">Outcome</string>
+</resources>
