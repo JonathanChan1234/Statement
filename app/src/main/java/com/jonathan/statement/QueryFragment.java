@@ -89,7 +89,7 @@ public class QueryFragment extends Fragment {
                 String type = selectedButton.getText().toString();
 
                 if(TextUtils.isEmpty(description) || TextUtils.isEmpty(amount) || TextUtils.isEmpty(purpose) || TextUtils.isEmpty(type)) {
-                    Toast.makeText(getContext(), "Some info is missiing", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Some info is missing", Toast.LENGTH_SHORT).show();
                 }
                 Map<String, String> params = new HashMap<>();
                 params.put("username", username);

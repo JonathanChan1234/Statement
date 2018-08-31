@@ -267,6 +267,7 @@ public class LoginActivity extends AppCompatActivity {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
         File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+        Log.d("Path", destination.getPath());
         FileOutputStream fo;
         try {
             destination.createNewFile();

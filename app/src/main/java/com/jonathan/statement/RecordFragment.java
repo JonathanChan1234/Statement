@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,8 +26,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RecordFragment extends Fragment implements FragmentBackHandler{
@@ -44,7 +46,7 @@ public class RecordFragment extends Fragment implements FragmentBackHandler{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_record, container, false);
     }
-    ListView listView;
+    RecyclerView listView;
     Button deleteButton;
 
     RequestQueue requestQueue;
@@ -60,6 +62,7 @@ public class RecordFragment extends Fragment implements FragmentBackHandler{
 
     ArrayList<Integer> selectedItemId = new ArrayList<>();
     ArrayList<String> recordList;
+    ArrayList<RecordItem> recordItems;
 
     boolean isBackHandled = false;
 
@@ -138,6 +141,7 @@ public class RecordFragment extends Fragment implements FragmentBackHandler{
         recordList = new ArrayList<>();
         if(response.length() == 0) recordList.clear();
         idList = new int[response.length()];
+        recordItems = new ArrayList<>();
         for(int i=0; i<response.length(); ++i) {
             try {
                 String record = response.getJSONObject(i).getString("created_at") +  " \tPurpose: "
@@ -146,33 +150,21 @@ public class RecordFragment extends Fragment implements FragmentBackHandler{
                 recordList.add(record);
                 idList[i] = response.getJSONObject(i).getInt("id");
                 Log.d("ID", idList[i] + "");
+                recordItems.add(new RecordItem(response.getJSONObject(i).getString("purpose"),
+                        response.getJSONObject(i).getString("description"),
+                        response.getJSONObject(i).getString("amount"),
+                        response.getJSONObject(i).getString("created_at")));
             }
             catch(JSONException e) {
                 e.printStackTrace();
             }
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, recordList) {
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                TextView textView = view.findViewById(android.R.id.text1);
-                textView.setTextColor(Color.rgb(0, 0,0));
-                return view;
-            }
-        };
-        listView.setAdapter(adapter);
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d("LongClicked", "add");
-                isBackHandled = true;
-                view.setBackgroundColor(Color.rgb(105, 255, 204));
-                selectedItemId.add(idList[i]);
-                setDeleteButtonVisible();
-                return false;
-            }
-        });
+
+        RecordAdapter recordAdapter = new RecordAdapter(recordItems);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        listView.setLayoutManager(layoutManager);
+        listView.setAdapter(recordAdapter);
     }
 
     private void setDeletefunction() {
@@ -237,22 +229,68 @@ public class RecordFragment extends Fragment implements FragmentBackHandler{
         if(isBackHandled) {
             isBackHandled = false;
             if(recordList == null) return false;
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, recordList){
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    View view = super.getView(position, convertView, parent);
-                    TextView textView = view.findViewById(android.R.id.text1);
-                    textView.setTextColor(Color.rgb(0, 0,0));
-                    return view;
-                }
-            };
-            listView.setAdapter(adapter);
+            RecordAdapter recordAdapter = new RecordAdapter(recordItems);
+            final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            listView.setLayoutManager(layoutManager);
+            listView.setAdapter(recordAdapter);
             Toast.makeText(getContext(), "Back pressed", Toast.LENGTH_SHORT).show();
             setDeleteButtonVisible();
             if(selectedItemId != null) selectedItemId.clear();
             return true;
         }
         return BackHandlerHelper.handleBackPress(this);
+    }
+
+    public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder>{
+        private List<RecordItem> dataSet;
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            TextView description_info, amount_info, date_info;
+            ImageView purpose_info;
+            ViewHolder(View view) {
+                super(view);
+                description_info = view.findViewById(R.id.description_info);
+                amount_info = view.findViewById(R.id.amount_info);
+                date_info = view.findViewById(R.id.time_info);
+                purpose_info = view.findViewById(R.id.purpose_info);
+            }
+        }
+
+        public RecordAdapter(List<RecordItem> dataSet) {
+            this.dataSet = dataSet;
+        }
+
+        @NonNull
+        @Override
+        public RecordAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.record_row_item,
+                    viewGroup, false);
+            ViewHolder vh = new ViewHolder(v);
+            return vh;
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull RecordAdapter.ViewHolder viewHolder, final int i) {
+            viewHolder.description_info.setText(dataSet.get(i).description);
+            viewHolder.amount_info.setText("$" + dataSet.get(i).amount);
+            viewHolder.date_info.setText(dataSet.get(i).date);
+            viewHolder.purpose_info.setImageResource(dataSet.get(i).imageId);
+            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Log.d("LongClicked", "add");
+                    isBackHandled = true;
+                    view.setBackgroundColor(Color.rgb(105, 255, 204));
+                    selectedItemId.add(idList[i]);
+                    setDeleteButtonVisible();
+                    return false;
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return dataSet.size();
+        }
     }
 }
